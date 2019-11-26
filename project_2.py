@@ -70,21 +70,18 @@ class Maze:
 
         return False,None,None,-1
 
-    def is_reversable(self):
+    def reversable(self):
         row = self.cx
         col = self.cy
         state = self.state
 
-        #print(row,col)
+        chh = state[row][col]
+        res = directions.index(chh)
 
-        for i in range(4):
-            colx = col+rxx[i]
-            rowy = row+ryy[i]
-         #   print(rowy,colx,state[rowy][colx])
-            if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and state[rowy][colx]!='#' and state[rowy][colx]!='S' and state[rowy][colx]!='.'  :
-                return True,rowy,colx
+        colx = col+rxx[res]
+        rowy = row+ryy[res]
 
-        return False,None,None
+        return rowy,colx
 
 
     def is_solved(self) ->bool :
@@ -100,11 +97,10 @@ class Maze:
             self.state[self.cx][self.cy]=directions[direction]
             self.findSolution()
         else:
-            isReversable,rowy,colx = self.is_reversable()
-            if isReversable:
-                self.state[self.cx][self.cy]='.'
-                self.cx,self.cy = rowy,colx
-                self.findSolution()
+            rowy,colx = self.reversable()
+            self.state[self.cx][self.cy]='.'
+            self.cx,self.cy = rowy,colx
+            self.findSolution()
 
 
 
@@ -112,13 +108,15 @@ class Maze:
 
 def getMaze():
     try:
-        f = open("test9.txt")
+        maxx = 0
+        f = open("test9withoutSpace.txt")
         maze = []
         while True:
             line = f.readline()
             if line:
                 xx = split(line)
                 if xx[-1] == '\n': xx.pop()
+                if(maxx<len(xx)):maxx=len(xx)
                 maze.append(xx)
             else:
                 break
@@ -147,13 +145,18 @@ def getMaze():
         errohandler(e, 0, NoEndPositionError,"Error: No end position found.")
         errohandler(sp, 0, UnSolveableError,"Error: No route could be found from start to end. Maze unsolvable.")
 
+        for row in maze:
+            while len(row)!=maxx:
+                row.append(' ')
+
     except FileNotFoundError:
         print("Error: Specified file does not exist.")
 
     return Maze(maze,sx,sy,ex,ey)
 
-mazefile = getMaze()
-mazefile.findSolution()
+if __name__=="__main__":
+    mazefile = getMaze()
+    mazefile.findSolution()
 
 
 
