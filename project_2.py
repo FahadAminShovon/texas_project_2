@@ -30,12 +30,15 @@ def isValid(c):
 
 xx = [1,-1,0,0]
 yy = [0,0,1,-1]
+#right,left, up, down
 
+directions = "><^v"
 class Maze:
     def __init__(self,state:list,sx,sy,ex,ey):
         self.state =  state
         self.sx,self.sy,self.ex,self.ey = sx,sy,ex,ey
         self.cx,self.cy = sx,sy
+
 
     def showMaze(self):
         for i in self.state:
@@ -45,18 +48,20 @@ class Maze:
         print()
         print("="*len(self.state[0]),"\n")
 
+
     def is_open_path(self):
-        cx = self.cx
-        cy = self.cy
+        row = self.cx
+        col = self.cy
         state = self.state
 
         for i in range(4):
-            tx = cx+xx
-            ty = cy+yy
-
-            if tx>=0 and tx<len(state[cx]) and ty>=0 and ty<len(state) and state[tx][ty]==" ":
-                return True,tx,ty
-        return False,None,None
+            colx = col+xx[i]
+            rowy = row+yy[i]
+            if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and state[rowy][colx]==' ':
+                print(1)
+                return True,rowy,colx,i
+            
+        return False,None,None,-1
 
 
     def is_solved(self) ->bool :
@@ -66,6 +71,12 @@ class Maze:
         self.showMaze()
         if self.is_solved():
             return
+        is_Open,rowy,colx,direction = self.is_open_path()
+
+        if is_Open:
+            self.state[self.cx][self.cy]=directions[direction]
+            self.cx,self.cy=rowy,colx
+
         self.findSolution()
 
 
@@ -88,19 +99,19 @@ def getMaze():
         sp = 0
         sx,sy,ex,ey = 0,0,0,0
 
-        for i in range(len(maze)):
-            for j in range(len(maze[i])):
-                temp = maze[i][j]
+        for row in range(len(maze)):
+            for col in range(len(maze[row])):
+                temp = maze[row][col]
                 em+=1
                 if temp=='E':
                     e+=1
-                    ex,ey=i,j
+                    ex,ey=row,col
                 elif temp=='S':
                     s+=1
-                    sx,sy=i,j
+                    sx,sy=row,col
                 elif temp==' ':
                     sp+=1
-                errohandler(isValid(temp), False, InvalidCharecterError, "Error: Maze contains invalid characters. Line {} contains invalid character {}".format(i,temp))
+                errohandler(isValid(temp), False, InvalidCharecterError, "Error: Maze contains invalid characters. Line {} contains invalid character {}".format(row,temp))
 
         errohandler(em,0,FileEmptyError,"Error: Specified file contains no maze.")
         errohandler(s, 0, NoStartPositionError,"Error: No start position found.")
