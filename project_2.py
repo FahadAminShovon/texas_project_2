@@ -1,4 +1,5 @@
 import sys
+# sys.setrecursionlimit(10**6)
 class NoStartPositionError(Exception):
     pass
 
@@ -34,7 +35,7 @@ yy = [0,0,-1,1]
 
 rxx = [-1,1,0,0]
 ryy = [0,0,1,-1]
-#left,right,down,upis
+#left,right,down,up
 
 directions = "><^v"
 class Maze:
@@ -58,17 +59,32 @@ class Maze:
         col = self.cy
         state = self.state
 
-        print(row,col)
+        #print(row,col)
 
         for i in range(4):
             colx = col+xx[i]
             rowy = row+yy[i]
-            print(rowy,colx,state[rowy][colx])
-            if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and state[rowy][colx]==' ':
-                print(1)
+            #print(rowy,colx,state[rowy][colx])
+            if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and (state[rowy][colx]=='E' or state[rowy][colx]==' '):
                 return True,rowy,colx,i
 
         return False,None,None,-1
+
+    def is_reversable(self):
+        row = self.cx
+        col = self.cy
+        state = self.state
+
+        #print(row,col)
+
+        for i in range(4):
+            colx = col+rxx[i]
+            rowy = row+ryy[i]
+         #   print(rowy,colx,state[rowy][colx])
+            if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and state[rowy][colx]!='#' and state[rowy][colx]!='S' and state[rowy][colx]!='.'  :
+                return True,rowy,colx
+
+        return False,None,None
 
 
     def is_solved(self) ->bool :
@@ -76,23 +92,27 @@ class Maze:
 
     def findSolution(self):
         self.showMaze()
-        if self.is_solved():
-            return
         is_Open,rowy,colx,direction = self.is_open_path()
-
         if is_Open:
             self.cx,self.cy=rowy,colx
+            if self.is_solved():
+                return
             self.state[self.cx][self.cy]=directions[direction]
+            self.findSolution()
+        else:
+            isReversable,rowy,colx = self.is_reversable()
+            if isReversable:
+                self.state[self.cx][self.cy]='.'
+                self.cx,self.cy = rowy,colx
+                self.findSolution()
 
 
-
-        self.findSolution()
 
 
 
 def getMaze():
     try:
-        f = open("test1.txt")
+        f = open("test9.txt")
         maze = []
         while True:
             line = f.readline()
