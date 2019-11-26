@@ -14,6 +14,12 @@ class UnSolveableError(Exception):
 class InvalidCharecterError(Exception):
     pass
 
+def errohandler(x,value,error,message):
+    try:
+        if x == value: raise error
+    except error:
+        print(message)
+        sys.exit(1)
 
 def split(word):
     return [char for char in word]
@@ -70,29 +76,10 @@ def getMaze():
                     print("Error: Maze contains invalid characters. Line {} contains invalid character {}".format(i,temp))
                     sys.exit(1)
 
-        try:
-            if em == 0:raise FileEmptyError
-        except FileEmptyError:
-            print("Error: Specified file contains no maze.")
-            sys.exit(1)
-
-        try:
-            if s == 0:raise NoStartPositionError
-        except NoStartPositionError:
-            print("Error: No start position found.")
-            sys.exit(1)
-
-        try:
-            if e == 0:raise NoEndPositionError
-        except NoEndPositionError:
-            print("Error: No end position found.")
-            sys.exit(1)
-
-        try:
-            if sp == 0:raise UnSolveableError
-        except UnSolveableError:
-            print("Error: No route could be found from start to end. Maze unsolvable.")
-            sys.exit(1)
+        errohandler(em,0,FileEmptyError,"Error: Specified file contains no maze.")
+        errohandler(s, 0, NoStartPositionError,"Error: No start position found.")
+        errohandler(e, 0, NoEndPositionError,"Error: No end position found.")
+        errohandler(sp, 0, UnSolveableError,"Error: No route could be found from start to end. Maze unsolvable.")
 
     except FileNotFoundError:
         print("Error: Specified file does not exist.")
