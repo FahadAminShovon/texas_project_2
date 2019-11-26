@@ -47,7 +47,7 @@ class Maze:
 
     def showMaze(self):
         for i in self.state:
-            for j  in i:
+            for j in i:
                 print(j,end="")
             print()
         print()
@@ -67,8 +67,8 @@ class Maze:
             #print(rowy,colx,state[rowy][colx])
             if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and (state[rowy][colx]=='E' or state[rowy][colx]==' '):
                 return True,rowy,colx,i
-
         return False,None,None,-1
+
 
     def reversable(self):
         row = self.cx
@@ -83,17 +83,33 @@ class Maze:
 
         return rowy,colx
 
+    def unsolvable(self):
+        row = self.cx
+        col = self.cy
+        state = self.state
+
+        if self.is_open_path():
+            for i in range(4):
+                colx = col + xx[i]
+                rowy = row + yy[i]
+                if colx >= 0 and colx < len(state[row]) and rowy >= 0 and rowy < len(state) and (
+                        state[rowy][colx] == 'E' or state[rowy][colx] == ' '):
+                    return True
+
+
 
     def is_solved(self) ->bool :
         return  self.cx == self.ex and self.cy == self.ey
 
     def findSolution(self):
+        if self.unsolvable():
+            return False
         self.showMaze()
         is_Open,rowy,colx,direction = self.is_open_path()
         if is_Open:
             self.cx,self.cy=rowy,colx
             if self.is_solved():
-                return
+                return True
             self.state[self.cx][self.cy]=directions[direction]
             self.findSolution()
         else:
