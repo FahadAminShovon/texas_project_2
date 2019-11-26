@@ -43,6 +43,14 @@ class Maze:
         self.state =  state
         self.sx,self.sy,self.ex,self.ey = sx,sy,ex,ey
         self.cx,self.cy = sx,sy
+        self.removeDuplicate()
+
+    def removeDuplicate(self):
+        for i in range(len(self.state)):
+            for j in range(len(self.state[i])):
+                if self.state[i][j]=='S':
+                    if i!=self.sx or j!=self.sy:
+                        self.state[i][j]='#'
 
 
     def showMaze(self):
@@ -76,34 +84,22 @@ class Maze:
         state = self.state
 
         chh = state[row][col]
+        if chh == 'S':
+            return False,None,None
+        if chh not in directions:
+            return True,0,0
         res = directions.index(chh)
 
         colx = col+rxx[res]
         rowy = row+ryy[res]
 
-        return rowy,colx
-
-    def unsolvable(self):
-        row = self.cx
-        col = self.cy
-        state = self.state
-
-        if self.is_open_path():
-            for i in range(4):
-                colx = col + xx[i]
-                rowy = row + yy[i]
-                if colx >= 0 and colx < len(state[row]) and rowy >= 0 and rowy < len(state) and (
-                        state[rowy][colx] == 'E' or state[rowy][colx] == ' '):
-                    return True
-
+        return True,rowy,colx
 
 
     def is_solved(self) ->bool :
         return  self.cx == self.ex and self.cy == self.ey
 
     def findSolution(self):
-        if self.unsolvable():
-            return False
         self.showMaze()
         is_Open,rowy,colx,direction = self.is_open_path()
         if is_Open:
@@ -112,11 +108,16 @@ class Maze:
                 return True
             self.state[self.cx][self.cy]=directions[direction]
             self.findSolution()
-        else:
-            rowy,colx = self.reversable()
-            self.state[self.cx][self.cy]='.'
-            self.cx,self.cy = rowy,colx
+        hasSolution,rowy, colx = self.reversable()
+        if hasSolution:
+            if self.is_solved():
+                return True
+            self.state[self.cx][self.cy] = '.'
+            self.cx, self.cy = rowy, colx
             self.findSolution()
+        else:return False
+
+
 
 
 
@@ -125,7 +126,7 @@ class Maze:
 def getMaze():
     try:
         maxx = 0
-        f = open("test9withoutSpace.txt")
+        f = open("multiplestart.txt")
         maze = []
         while True:
             line = f.readline()
@@ -140,7 +141,7 @@ def getMaze():
         e = 0
         em = 0
         sp = 0
-        sx,sy,ex,ey = 0,0,0,0
+        sx,sy,ex,ey = [],[],0,0
 
         for row in range(len(maze)):
             for col in range(len(maze[row])):
@@ -151,7 +152,8 @@ def getMaze():
                     ex,ey=row,col
                 elif temp=='S':
                     s+=1
-                    sx,sy=row,col
+                    sx.append(row)
+                    sy.append(col)
                 elif temp==' ':
                     sp+=1
                 errohandler(isValid(temp), False, InvalidCharecterError, "Error: Maze contains invalid characters. Line {} contains invalid character {}".format(row,temp))
@@ -164,15 +166,20 @@ def getMaze():
         for row in maze:
             while len(row)!=maxx:
                 row.append(' ')
+        mazes = []
+
+        for i in range(len(sx)):
+            mazes.append(Maze(maze,sx[i],sy[i],ex,ey))
 
     except FileNotFoundError:
         print("Error: Specified file does not exist.")
 
-    return Maze(maze,sx,sy,ex,ey)
+    return mazes
 
 if __name__=="__main__":
     mazefile = getMaze()
-    mazefile.findSolution()
+    for maze in mazefile:
+        maze.showMaze()
 
 
 
