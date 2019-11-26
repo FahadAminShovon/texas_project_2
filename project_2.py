@@ -29,8 +29,12 @@ def isValid(c):
     return  c in 'SE# ^>V^'
 
 xx = [1,-1,0,0]
-yy = [0,0,1,-1]
+yy = [0,0,-1,1]
 #right,left, up, down
+
+rxx = [-1,1,0,0]
+ryy = [0,0,1,-1]
+#left,right,down,upis
 
 directions = "><^v"
 class Maze:
@@ -54,13 +58,16 @@ class Maze:
         col = self.cy
         state = self.state
 
+        print(row,col)
+
         for i in range(4):
             colx = col+xx[i]
             rowy = row+yy[i]
+            print(rowy,colx,state[rowy][colx])
             if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and state[rowy][colx]==' ':
                 print(1)
                 return True,rowy,colx,i
-            
+
         return False,None,None,-1
 
 
@@ -74,8 +81,10 @@ class Maze:
         is_Open,rowy,colx,direction = self.is_open_path()
 
         if is_Open:
-            self.state[self.cx][self.cy]=directions[direction]
             self.cx,self.cy=rowy,colx
+            self.state[self.cx][self.cy]=directions[direction]
+
+
 
         self.findSolution()
 
