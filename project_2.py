@@ -188,7 +188,6 @@ if __name__=="__main__":
     mazefile = getMaze()
     try:
         counter = 0
-
         for maze in mazefile:
             if maze.findSolution():
                 maze.showMaze()
