@@ -1,4 +1,5 @@
 import sys
+import copy
 # sys.setrecursionlimit(10**6)
 class NoStartPositionError(Exception):
     pass
@@ -40,26 +41,37 @@ ryy = [0,0,1,-1]
 directions = "><^v"
 class Maze:
     def __init__(self,state:list,sx,sy,ex,ey):
-        self.state =  state
+        self.state =  copy.deepcopy(state)
         self.sx,self.sy,self.ex,self.ey = sx,sy,ex,ey
         self.cx,self.cy = sx,sy
+        # print(self.sx, self.sy)
         self.removeDuplicate()
+        self.solutions = []
 
     def removeDuplicate(self):
         for i in range(len(self.state)):
             for j in range(len(self.state[i])):
                 if self.state[i][j]=='S':
                     if i!=self.sx or j!=self.sy:
+                        # print(i,j)
                         self.state[i][j]='#'
 
-
-    def showMaze(self):
+    def showCurrentMaze(self):
         for i in self.state:
             for j in i:
-                print(j,end="")
+                print(j, end="")
             print()
         print()
-        print("="*len(self.state[0]),"\n")
+        print("=" * len(self.state[0]), "\n")
+
+    def showMaze(self):
+        for state in self.solutions:
+            for i in state:
+                for j in i:
+                    print(j,end="")
+                print()
+            print()
+            print("="*len(state[0]),"\n")
 
 
     def is_open_path(self):
@@ -100,7 +112,7 @@ class Maze:
         return  self.cx == self.ex and self.cy == self.ey
 
     def findSolution(self):
-        self.showMaze()
+        self.solutions.append(copy.deepcopy(self.state))
         is_Open,rowy,colx,direction = self.is_open_path()
         if is_Open:
             self.cx,self.cy=rowy,colx
@@ -119,14 +131,10 @@ class Maze:
 
 
 
-
-
-
-
 def getMaze():
     try:
         maxx = 0
-        f = open("multiplestart.txt")
+        f = open("test1.txt")
         maze = []
         while True:
             line = f.readline()
@@ -178,8 +186,17 @@ def getMaze():
 
 if __name__=="__main__":
     mazefile = getMaze()
-    for maze in mazefile:
-        maze.showMaze()
+    try:
+        counter = 0
+
+        for maze in mazefile:
+            if maze.findSolution():
+                maze.showMaze()
+                counter+=1
+        if counter==0:raise UnSolveableError
+    except UnSolveableError:
+        print("Error: No route could be found from start to end. Maze unsolvable.")
+        sys.exit(1)
 
 
 
