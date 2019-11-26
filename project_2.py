@@ -22,6 +22,17 @@ def split(word):
 def isValid(c):
     return  c in 'SE# ^>V^'
 
+class Maze:
+    def __init__(self,state:list,sx,sy,ex,ey):
+        self.state =  state
+        self.sx,self.sy,self.ex,self.ey = sx,sy,ex,ey
+
+    def showMaze(self):
+        for i in self.state:
+            for j  in i:
+                print(j,end="")
+            print()
+
 def getMaze():
     try:
         f = open("test1.txt")
@@ -38,7 +49,7 @@ def getMaze():
         e = 0
         em = 0
         sp = 0
-
+        sx,sy,ex,ey = 0,0,0,0
 
         for i in range(len(maze)):
             for j in range(len(maze[i])):
@@ -46,8 +57,10 @@ def getMaze():
                 em+=1
                 if temp=='E':
                     e+=1
+                    ex,ey=i,j
                 elif temp=='S':
                     s+=1
+                    sx,sy=i,j
                 elif temp==' ':
                     sp+=1
 
@@ -81,11 +94,17 @@ def getMaze():
             print("Error: No route could be found from start to end. Maze unsolvable.")
             sys.exit(1)
 
-
-
-
-
-
     except FileNotFoundError:
         print("Error: Specified file does not exist.")
+
+    return Maze(maze,sx,sy,ex,ey)
+
+mazefile = getMaze()
+mazefile.showMaze()
+print("startPos {},{}".format(mazefile.sx,mazefile.sy))
+print("endPos {},{}".format(mazefile.ex,mazefile.ey))
+
+
+
+
 
