@@ -28,16 +28,47 @@ def split(word):
 def isValid(c):
     return  c in 'SE# ^>V^'
 
+xx = [1,-1,0,0]
+yy = [0,0,1,-1]
+
 class Maze:
     def __init__(self,state:list,sx,sy,ex,ey):
         self.state =  state
         self.sx,self.sy,self.ex,self.ey = sx,sy,ex,ey
+        self.cx,self.cy = sx,sy
 
     def showMaze(self):
         for i in self.state:
             for j  in i:
                 print(j,end="")
             print()
+        print()
+        print("="*len(self.state[0]),"\n")
+
+    def is_open_path(self):
+        cx = self.cx
+        cy = self.cy
+        state = self.state
+
+        for i in range(4):
+            tx = cx+xx
+            ty = cy+yy
+
+            if tx>=0 and tx<len(state[cx]) and ty>=0 and ty<len(state) and state[tx][ty]==" ":
+                return True,tx,ty
+        return False,None,None
+
+
+    def is_solved(self) ->bool :
+        return  self.cx == self.ex and self.cy == self.ey
+
+    def findSolution(self):
+        self.showMaze()
+        if self.is_solved():
+            return
+        self.findSolution()
+
+
 
 def getMaze():
     try:
@@ -69,12 +100,7 @@ def getMaze():
                     sx,sy=i,j
                 elif temp==' ':
                     sp+=1
-
-                try:
-                    if isValid(temp)==False:raise InvalidCharecterError
-                except InvalidCharecterError:
-                    print("Error: Maze contains invalid characters. Line {} contains invalid character {}".format(i,temp))
-                    sys.exit(1)
+                errohandler(isValid(temp), False, InvalidCharecterError, "Error: Maze contains invalid characters. Line {} contains invalid character {}".format(i,temp))
 
         errohandler(em,0,FileEmptyError,"Error: Specified file contains no maze.")
         errohandler(s, 0, NoStartPositionError,"Error: No start position found.")
@@ -87,9 +113,7 @@ def getMaze():
     return Maze(maze,sx,sy,ex,ey)
 
 mazefile = getMaze()
-mazefile.showMaze()
-print("startPos {},{}".format(mazefile.sx,mazefile.sy))
-print("endPos {},{}".format(mazefile.ex,mazefile.ey))
+mazefile.findSolution()
 
 
 
