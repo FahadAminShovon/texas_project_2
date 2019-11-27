@@ -2,15 +2,24 @@ import sys
 import copy
 
 def errohandler(x,value,message):
+    '''
+    if x == value shows error
+    '''
     if x == value:
         print(message)
         sys.exit(1)
 
 def split(word):
+    '''
+    turns strings into charecter list
+    '''
     return [char for char in word]
 
 
 def isValid(c):
+    '''
+    checkes if the charecter is valid
+    '''
     return  c in 'SE# ^>V^'
 
 xx = [1,-1,0,0]
@@ -27,6 +36,9 @@ cx,cy = 0,0
 directions = "><^v"
 
 def solve(matrix,sx,sy,ex,ey):
+    '''
+    prints result if the maze has a solution
+    '''
     global cx,cy
 
     state = copy.deepcopy(matrix)
@@ -41,6 +53,9 @@ def solve(matrix,sx,sy,ex,ey):
 
 
 def removeDuplicate(state,sx,sy):
+    '''
+    keeps only the current starting point and turns other starting points to #
+    '''
     for i in range(len(state)):
         for j in range(len(state[i])):
             if state[i][j] == 'S':
@@ -49,6 +64,9 @@ def removeDuplicate(state,sx,sy):
 
 
 def showCurrentMaze(state):
+    '''
+    used for testing purpose, to taste the current state of a maze
+    '''
     for i in state:
         for j in i:
             print(j, end="")
@@ -59,6 +77,10 @@ def showCurrentMaze(state):
 
 
 def showMaze(solutions):
+
+    '''
+    prints solutions
+    '''
     for state in solutions:
         for i in state:
             for j in i:
@@ -68,6 +90,11 @@ def showMaze(solutions):
         print("="*len(state[0]),"\n")
 
 def is_open_path(state):
+
+    '''
+    checks if the current position has any free position to move
+    '''
+
     global cx,cy
     row=cx
     col=cy
@@ -80,6 +107,10 @@ def is_open_path(state):
 
 
 def reversable(state):
+    '''
+    backtracks and reverses the position
+    if backtracks to starting positoin then the maze has no solution hence returns false
+    '''
     global cx,cy
     row = cx
     col = cy
@@ -99,10 +130,20 @@ def reversable(state):
 
 
 def is_solved(ex,ey):
+
+    '''
+    checks if current positoin is the ending point
+    if it is ,then returns true
+    '''
     global cx,cy
     return cx == ex and cy == ey
 
 def findSolution(solutions,state,ex,ey):
+    '''
+    checks if it can go forwarnd returns true returns true if reaches solution
+    or backtracks if there is no way ahead returnes true if reachers solution
+    if no solution is found returns false
+    '''
     global cx,cy
     solutions.append(copy.deepcopy(state))
     #showMaze(solutions)
@@ -126,6 +167,11 @@ def findSolution(solutions,state,ex,ey):
 
 
 def getMaze():
+
+    '''
+    generates mazes for multiple staring points or single maze if there is only one starting point
+    '''
+
     try:
         maxx = 0
         f = open("multiplestart.txt")
