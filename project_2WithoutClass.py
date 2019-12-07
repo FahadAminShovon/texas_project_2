@@ -125,8 +125,15 @@ def reversable(state):
 
     colx = col + rxx[res]
     rowy = row + ryy[res]
+    if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and (state[rowy][colx]!='.' and state[rowy][colx]!='#'):
+        return True, rowy, colx
+    for i in range(4):
+        colx = col+xx[i]
+        rowy = row+yy[i]
+        if colx>=0 and colx<len(state[row]) and rowy>=0 and rowy<len(state) and (state[rowy][colx] in directions ):
+            return True,rowy,colx
 
-    return True, rowy, colx
+    return False,None,None
 
 
 def is_solved(ex,ey):
@@ -149,6 +156,8 @@ def findSolution(solutions,state,ex,ey):
     #showMaze(solutions)
     is_Open, rowy, colx, direction = is_open_path(state)
     if is_Open:
+        if state[cx][cy]!="S":
+            state[cx][cy]=directions[direction]
         cx, cy = rowy, colx
         if is_solved(ex,ey):
             return True
@@ -174,7 +183,7 @@ def getMaze():
 
     try:
         maxx = 0
-        f = open("multiplestart.txt")
+        f = open("test1.txt")
         maze = []
         while True:
             line = f.readline()
